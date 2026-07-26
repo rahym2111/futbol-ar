@@ -22,10 +22,9 @@
       overflow: hidden; 
       background-color: #0b0e14; 
       color: #ffffff; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     
-    /* 3D Model Viewer ekrany doldurýar */
     model-viewer {
       width: 100vw;
       height: 100vh;
@@ -37,7 +36,7 @@
       z-index: 1;
     }
 
-    /* Ýokarky Dolandyryş Paneli (Header) */
+    /* Ýokarky Dolandyryş Paneli */
     .top-container {
       position: absolute;
       top: 20px;
@@ -50,13 +49,12 @@
       z-index: 100;
       width: 90%;
       max-width: 380px;
-      pointer-events: none; /* Düzümleriň aşagyndaky 3D modeliň aýlanmagy üçin */
+      pointer-events: none;
     }
 
-    /* Maglumat Bar-y */
     .header-info {
       width: 100%;
-      background: rgba(18, 24, 38, 0.75);
+      background: rgba(18, 24, 38, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -72,19 +70,16 @@
       color: #58a6ff; 
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      text-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
     }
 
     .player-sub { 
       font-size: 11px; 
       color: #8b949e; 
       margin-top: 2px; 
-      font-weight: 500;
     }
 
-    /* AR Düğmesi - Indiki Ýeri Ýokarda */
     .ar-button {
-      pointer-events: auto; /* Düwme basylar ýaly */
+      pointer-events: auto;
       width: 100%;
       background: linear-gradient(135deg, #238636, #1f6feb);
       color: #ffffff;
@@ -95,7 +90,6 @@
       border-radius: 16px;
       cursor: pointer;
       box-shadow: 0 6px 20px rgba(31, 111, 235, 0.4);
-      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -104,56 +98,51 @@
 
     .ar-button:active {
       transform: scale(0.97);
-      box-shadow: 0 2px 10px rgba(31, 111, 235, 0.3);
     }
   </style>
 </head>
 <body>
 
-  <!-- Ýokarky Bölüm: Maglumat + AR Düwme -->
   <div class="top-container">
     <div class="header-info">
       <div class="player-title" id="playerName">CRISTIANO RONALDO</div>
       <div class="player-sub">3D Realny AR Model</div>
     </div>
 
-    <!-- Model-viewer üçin custom AR düwmesi göni ýokarda durýar -->
     <button id="customArBtn" class="ar-button" onclick="activateAR()">
       <span>📷</span> Ýanymda Görkez (3D AR)
     </button>
   </div>
 
-  <!-- 3D Model Viewer -->
+  <!-- AR Durnuklylygy Ýokarlandyrylan Model Viewer -->
   <model-viewer 
     id="viewer"
     src="models/ronaldo.glb" 
     ar 
-    ar-modes="webxr scene-viewer quick-look" 
+    ar-modes="scene-viewer quick-look webxr" 
     ar-scale="fixed"
     ar-placement="floor"
-    disable-tap
+    bounds="tight"
     camera-controls 
+    enable-pan="false"
     interaction-prompt="none"
-    shadow-intensity="1.2"
-    shadow-softness="0.4"
+    shadow-intensity="1"
+    shadow-softness="0.2"
     power-preference="high-performance"
     loading="eager"
     alt="3D Futbolçy Modeli">
   </model-viewer>
 
   <script>
-    // URL parametrik gözleg (?id=messi ýa-da ?id=ronaldo)
     const urlParams = new URLSearchParams(window.location.search);
     const playerId = urlParams.get('id') || 'ronaldo'; 
 
     const viewer = document.getElementById('viewer');
     const playerName = document.getElementById('playerName');
 
-    // Futbolçynyň adyny we modelini düzeltmek
     playerName.innerText = playerId.replace(/[-_]/g, ' ').toUpperCase();
     viewer.src = `models/${playerId.toLowerCase()}.glb`;
 
-    // Ýokarky düwmä basylanda AR režimini çagarmak
     function activateAR() {
       if (viewer.canActivateAR) {
         viewer.activateAR();
