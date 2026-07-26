@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AR Futbolçy</title>
   
-  <!-- Model Viewer & QR Code Generator Library -->
+  <!-- Model Viewer Library -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
   <style>
     * { 
@@ -17,20 +16,25 @@
       -webkit-tap-highlight-color: transparent;
     }
     
-    body { 
-      width: 100vw; 
-      height: 100vh; 
+    html, body { 
+      width: 100%; 
+      height: 100%; 
       overflow: hidden; 
       background-color: #0d1117; 
       color: #ffffff; 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     
+    /* Model Viewer tutuş ekrany eýeleýär */
     model-viewer {
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       --poster-color: transparent;
-      will-change: transform;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
     }
 
     /* Ýokarky Maglumat Bar-y */
@@ -39,15 +43,16 @@
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(22, 27, 34, 0.8);
+      background: rgba(22, 27, 34, 0.85);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       padding: 10px 24px;
       border-radius: 20px;
       text-align: center;
       z-index: 10;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      pointer-events: none; /* Model-i aňsatlyk bilen aýlamagyna päsgel bermezligi üçin */
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     }
 
     .player-title { 
@@ -64,62 +69,28 @@
       margin-top: 2px; 
     }
 
-    /* AR Düğmesi (Mobil üçin) */
+    /* AR Düğmesi (Öňe çykaryldy we basylar ýaly z-index ýokarlandyryldy) */
     .ar-button {
       position: absolute;
-      bottom: 30px;
+      bottom: 40px;
       left: 50%;
       transform: translateX(-50%);
       background: linear-gradient(135deg, #238636, #1f6feb);
       color: #ffffff;
       border: none;
-      padding: 14px 28px;
-      font-size: 15px;
+      padding: 16px 32px;
+      font-size: 16px;
       font-weight: 600;
       border-radius: 50px;
-      z-index: 10;
+      z-index: 100; /* Basylman galmazlygy üçin öňe geçirildi */
       cursor: pointer;
-      box-shadow: 0 4px 20px rgba(31, 111, 235, 0.4);
+      box-shadow: 0 4px 20px rgba(31, 111, 235, 0.5);
+      white-space: nowrap;
     }
 
-    /* QR Kod Düwmesi (Kompýuterde görkezip telefona skan etdirmek üçin) */
-    .qr-toggle-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: rgba(22, 27, 34, 0.8);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: white;
-      padding: 10px 14px;
-      border-radius: 12px;
-      cursor: pointer;
-      z-index: 10;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .ar-button:active {
+      transform: translateX(-50%) scale(0.95);
     }
-
-    /* QR Kod Modal Pencerasy */
-    .qr-modal {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #161b22;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 20px;
-      border-radius: 16px;
-      text-align: center;
-      z-index: 100;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-    }
-
-    .qr-modal h3 { font-size: 14px; margin-bottom: 12px; color: #8b949e; }
-    #qrcode { background: #ffffff; padding: 10px; border-radius: 8px; display: inline-block; }
-    .close-qr { margin-top: 12px; background: #21262d; border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -128,19 +99,6 @@
   <div class="header-info">
     <div class="player-title" id="playerName">RONALDO</div>
     <div class="player-sub">3D Realny AR Model</div>
-  </div>
-
-  <!-- QR Kod Düwmesi -->
-  <button class="qr-toggle-btn" onclick="toggleQR()">
-    📱 QR Kody Görkez
-  </button>
-
-  <!-- QR Pop-up Modal -->
-  <div class="qr-modal" id="qrModal">
-    <h3>Telefonyňyz bilen skan ediň:</h3>
-    <div id="qrcode"></div>
-    <br>
-    <button class="close-qr" onclick="toggleQR()">Ýap</button>
   </div>
 
   <!-- 3D Model Viewer -->
@@ -166,30 +124,18 @@
   </model-viewer>
 
   <script>
-    // URL parametrik gözleg (mysal üçin: site.com/?id=messi)
     const urlParams = new URLSearchParams(window.location.search);
-    const playerId = urlParams.get('id') || 'ronaldo'; // ID ýazylmasa avtomat ronaldo açar
+    // URL-de id bolmasa "ronaldo" bolup açylar
+    const playerId = urlParams.get('id') || 'ronaldo'; 
 
     const viewer = document.getElementById('viewer');
     const playerName = document.getElementById('playerName');
 
-    // Futbolçynyn adyny we modelini düzeltmek
+    // Futbolçynyň adyny üýtgetmek
     playerName.innerText = playerId.replace(/[-_]/g, ' ').toUpperCase();
+    
+    // Model faýlynyň ýoluny bellenilýär (Körünýän ähli harplar kiçi harp bilen: models/ronaldo.glb)
     viewer.src = `models/${playerId.toLowerCase()}.glb`;
-
-    // Häzirki sahypanyň URL-y boýunça QR kod döretmek
-    const currentUrl = window.location.href;
-    new QRCode(document.getElementById("qrcode"), {
-      text: currentUrl,
-      width: 160,
-      height: 160
-    });
-
-    // QR Modaly açyp/ýapmak
-    function toggleQR() {
-      const modal = document.getElementById('qrModal');
-      modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
-    }
   </script>
 
 </body>
