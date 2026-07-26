@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Realny AR Futbolçy</title>
   
-  <!-- Preconnect & Preload: Model viewer-i öňünden tiz ýüklemek -->
   <link rel="preconnect" href="https://ajax.googleapis.com">
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
   
@@ -37,6 +36,7 @@
       z-index: 1;
     }
 
+    /* Ýokarky Başlyk */
     .top-container {
       position: absolute;
       top: 20px;
@@ -45,8 +45,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      z-index: 100;
+      z-index: 10;
       width: 90%;
       max-width: 380px;
       pointer-events: none;
@@ -78,9 +77,14 @@
       margin-top: 2px; 
     }
 
-    .ar-button {
-      pointer-events: auto;
-      width: 100%;
+    /* MODEL-VIEWER-IŇ NATIVE AR DÜWMESI (ÝOKARDA ÝERLEŞDIRILDI) */
+    .ar-native-button {
+      position: absolute;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 380px;
       background: linear-gradient(135deg, #238636, #1f6feb);
       color: #ffffff;
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -94,25 +98,26 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      z-index: 100;
+      white-space: nowrap;
     }
 
-    .ar-button:active {
-      transform: scale(0.97);
+    .ar-native-button:active {
+      transform: translateX(-50%) scale(0.97);
     }
 
-    /* Model ýüklenýän wagty çykýan meýdança */
     #loadingText {
       position: absolute;
-      bottom: 30px;
+      bottom: 40px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.7);
-      padding: 8px 16px;
+      background: rgba(0, 0, 0, 0.75);
+      padding: 10px 20px;
       border-radius: 20px;
       font-size: 13px;
       color: #58a6ff;
       z-index: 10;
-      display: none;
+      border: 1px solid rgba(88, 166, 255, 0.3);
     }
   </style>
 </head>
@@ -120,32 +125,32 @@
 
   <div class="top-container">
     <div class="header-info">
-      <div class="player-title" id="playerName">CRISTIANO RONALDO</div>
+      <div class="player-title" id="playerName">RONALDO</div>
       <div class="player-sub">3D Realny AR Model</div>
     </div>
-
-    <button id="customArBtn" class="ar-button" onclick="activateAR()">
-      <span>📷</span> Ýanymda Görkez (3D AR)
-    </button>
   </div>
 
   <div id="loadingText">3D Model Ýüklenýär...</div>
 
-  <!-- Tizlik üçin Optimizirlenen Model Viewer -->
   <model-viewer 
     id="viewer"
     src="models/ronaldo.glb" 
     ar 
-    ar-modes="webxr scene-viewer" 
-    ar-scale="fixed"
+    ar-modes="scene-viewer quick-look webxr" 
+    ar-scale="auto"
     ar-placement="floor"
-    interaction-prompt="none"
     camera-controls 
-    progressive-reveal
+    interaction-prompt="none"
     power-preference="high-performance"
     loading="eager"
     shadow-intensity="1"
     alt="3D Futbolçy Modeli">
+    
+    <!-- SLOT="AR-BUTTON" arkaly native düwme model-viewer-e baglandy -->
+    <button slot="ar-button" class="ar-native-button">
+      <span>📷</span> Ýanymda Görkez (3D AR)
+    </button>
+
   </model-viewer>
 
   <script>
@@ -157,27 +162,19 @@
     const loadingText = document.getElementById('loadingText');
 
     playerName.innerText = playerId.replace(/[-_]/g, ' ').toUpperCase();
-    viewer.src = `models/${playerId.toLowerCase()}.glb`;
+    
+    // Model faýlynyň durnukly ýüklenmegi
+    const modelPath = `models/${playerId.toLowerCase()}.glb`;
+    viewer.src = modelPath;
 
-    // Ýükleniş indikatory
-    loadingText.style.display = 'block';
     viewer.addEventListener('load', () => {
       loadingText.style.display = 'none';
     });
 
-    viewer.addEventListener('ar-status', (event) => {
-      if (event.detail.status === 'session-started') {
-        viewer.scale = '1 1 1';
-      }
+    viewer.addEventListener('error', (ev) => {
+      loadingText.innerText = "Model faýly tapylmady: " + modelPath;
+      loadingText.style.color = "#ff7b72";
     });
-
-    function activateAR() {
-      if (viewer.canActivateAR) {
-        viewer.activateAR();
-      } else {
-        alert("Siziň telefonyňyz ýa-da brauzeriňiz AR (Augmented Reality) režimini goldamaýar.");
-      }
-    }
   </script>
 
 </body>
