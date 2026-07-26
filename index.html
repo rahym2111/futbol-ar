@@ -7,151 +7,47 @@
   <!-- Google Model-Viewer -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background-color: #0b0e14; color: white; }
-    
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background-color: #111; color: white; font-family: sans-serif; }
     model-viewer { width: 100%; height: 100%; }
-
-    /* Futbolçy Malumat Barmagy (Header Info) */
-    .player-card-info {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(18, 24, 38, 0.85);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 12px 24px;
-      border-radius: 20px;
-      text-align: center;
-      z-index: 1000;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-      min-width: 250px;
-    }
-    .player-name { font-size: 20px; font-weight: bold; margin: 0; color: #ffcc00; letter-spacing: 1px; }
-    .player-stats { font-size: 13px; color: #a0aec0; margin-top: 4px; }
-
-    /* AR Düwmesi */
-    .ar-button {
-      position: absolute;
-      bottom: 35px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, #007bff, #0056b3);
-      color: white;
-      border: none;
-      padding: 16px 36px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 50px;
-      box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
-      z-index: 1000;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Bildiriş Teksti */
-    .sound-hint {
-      position: absolute;
-      bottom: 95px;
-      width: 100%;
-      text-align: center;
-      font-size: 12px;
-      color: rgba(255,255,255,0.7);
-      z-index: 999;
-      pointer-events: none;
+    .info { position: absolute; top: 20px; width: 100%; text-align: center; z-index: 10; pointer-events: none; }
+    .ar-btn {
+      position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
+      background: #007bff; color: white; border: none; padding: 14px 28px;
+      font-size: 16px; font-weight: bold; border-radius: 30px; z-index: 10;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
   </style>
 </head>
 <body>
 
-  <!-- Futbolçy Barada Maglumat -->
-  <div class="player-card-info">
-    <h1 class="player-name" id="playerName">Ýüklenýär...</h1>
-    <div class="player-stats" id="playerStats">Futbol AR Collection</div>
+  <div class="info">
+    <h2 id="p-name">CRISTIANO RONALDO</h2>
+    <p>3D AR Modell</p>
   </div>
 
-  <div class="sound-hint">🔊 Futbolçynyň üstüne basyp sesi çykaryň</div>
-
-  <!-- 3D Model Viewer -->
+  <!-- Göni model.glb diýen taýýar faýlyňyzy okaýar -->
   <model-viewer 
-    id="footballer"
-    src="" 
+    id="viewer"
+    src="model.glb" 
     ar 
     ar-modes="webxr scene-viewer quick-look" 
     ar-placement="floor"
     camera-controls 
     touch-action="pan-y"
-    shadow-intensity="1.5"
-    shadow-softness="1"
-    alt="Futbolçy 3D Model">
-    
-    <button slot="ar-button" class="ar-button">
-      <span>📷</span> Ýanymda Görkez (3D AR)
-    </button>
+    shadow-intensity="1">
+    <button slot="ar-button" class="ar-btn">📷 Ýanymda Görkez (3D AR)</button>
   </model-viewer>
 
-  <!-- Dinamiki Ses Faýly -->
-  <audio id="playerSound" src="" preload="auto"></audio>
-
   <script>
-    // 1. Ähli futbolçylaryň maglumatlar bazasy (Database)
-    const playersData = {
-      "ronaldo": {
-        name: "Cristiano Ronaldo",
-        stats: "Rating: 91 | PAC: 87 | SHO: 93",
-        model: "models/model.glb",
-        sound: "sounds/ronaldo.mp3",
-        scale: "1 1 1"
-      },
-      "messi": {
-        name: "Lionel Messi",
-        stats: "Rating: 92 | PAC: 85 | DRI: 94",
-        model: "models/messi.glb",
-        sound: "sounds/messi.mp3",
-        scale: "1 1 1"
-      },
-      "mbappe": {
-        name: "Kylian Mbappé",
-        stats: "Rating: 91 | PAC: 97 | DRI: 92",
-        model: "models/mbappe.glb",
-        sound: "sounds/mbappe.mp3",
-        scale: "1 1 1"
-      },
-      "default": {
-        name: "Futbolçy 3D",
-        stats: "AR Collection Card",
-        model: "model.glb",
-        sound: "sound.mp3",
-        scale: "1 1 1"
-      }
-    };
-
-    // 2. URL-den ID-ni okamak (Meselem: ?id=ronaldo)
+    // Linkden id okamak (?id=ronaldo)
     const urlParams = new URLSearchParams(window.location.search);
-    const playerId = urlParams.get('id') || 'default';
+    const id = urlParams.get('id');
 
-    // 3. Degişli futbolçynyň maglumatlaryny saýlamak
-    const player = playersData[playerId] || playersData['default'];
-
-    // 4. Sahypadaky elementleri täzelemek
-    document.getElementById('playerName').innerText = player.name;
-    document.getElementById('playerStats').innerText = player.stats;
-
-    const viewer = document.getElementById('footballer');
-    viewer.setAttribute('src', player.model);
-    viewer.setAttribute('scale', player.scale);
-
-    const sound = document.getElementById('playerSound');
-    sound.setAttribute('src', player.sound);
-
-    // 5. Futbolçynyň üstüne basylanda sesi çalmak
-    viewer.addEventListener('click', () => {
-      sound.currentTime = 0;
-      sound.play().catch(e => console.log("Ses üçin ekrana basyň"));
-    });
+    const pName = document.getElementById('p-name');
+    if (id) {
+      pName.innerText = id.toUpperCase();
+    }
   </script>
 
 </body>
