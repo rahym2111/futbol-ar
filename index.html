@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Realny AR Futbolçy</title>
   
-  <!-- Google Model-Viewer Library -->
+  <!-- Preconnect & Preload: Model viewer-i öňünden tiz ýüklemek -->
+  <link rel="preconnect" href="https://ajax.googleapis.com">
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
   
   <style>
@@ -98,6 +99,21 @@
     .ar-button:active {
       transform: scale(0.97);
     }
+
+    /* Model ýüklenýän wagty çykýan meýdança */
+    #loadingText {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: #58a6ff;
+      z-index: 10;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -113,6 +129,9 @@
     </button>
   </div>
 
+  <div id="loadingText">3D Model Ýüklenýär...</div>
+
+  <!-- Tizlik üçin Optimizirlenen Model Viewer -->
   <model-viewer 
     id="viewer"
     src="models/ronaldo.glb" 
@@ -122,9 +141,10 @@
     ar-placement="floor"
     interaction-prompt="none"
     camera-controls 
-    shadow-intensity="1"
+    progressive-reveal
     power-preference="high-performance"
     loading="eager"
+    shadow-intensity="1"
     alt="3D Futbolçy Modeli">
   </model-viewer>
 
@@ -134,14 +154,19 @@
 
     const viewer = document.getElementById('viewer');
     const playerName = document.getElementById('playerName');
+    const loadingText = document.getElementById('loadingText');
 
     playerName.innerText = playerId.replace(/[-_]/g, ' ').toUpperCase();
     viewer.src = `models/${playerId.toLowerCase()}.glb`;
 
-    // AR Durnuklylygy üçin Event-ler
+    // Ýükleniş indikatory
+    loadingText.style.display = 'block';
+    viewer.addEventListener('load', () => {
+      loadingText.style.display = 'none';
+    });
+
     viewer.addEventListener('ar-status', (event) => {
       if (event.detail.status === 'session-started') {
-        // AR başladylanda modeliň scale we rotation-yny bir gezek lock (berkitmek) edýäris
         viewer.scale = '1 1 1';
       }
     });
