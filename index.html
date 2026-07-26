@@ -3,50 +3,113 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futbol AR Collection</title>
-  <!-- Google Model-Viewer -->
+  <title>Realny AR Futbolçy</title>
+  
+  <!-- Google Model-Viewer Library -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+  
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background-color: #111; color: white; font-family: sans-serif; }
-    model-viewer { width: 100%; height: 100%; }
-    .info { position: absolute; top: 20px; width: 100%; text-align: center; z-index: 10; pointer-events: none; }
-    .ar-btn {
-      position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
-      background: #007bff; color: white; border: none; padding: 14px 28px;
-      font-size: 16px; font-weight: bold; border-radius: 30px; z-index: 10;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { width: 100vw; height: 100vh; overflow: hidden; background-color: #0d1117; color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      --poster-color: transparent;
+    }
+
+    /* Futbolçy ady durýan ýer */
+    .header-info {
+      position: absolute;
+      top: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(22, 27, 34, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 20px;
+      text-align: center;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .player-title { font-size: 18px; font-weight: 700; color: #58a6ff; letter-spacing: 1px; }
+    .player-sub { font-size: 12px; color: #8b949e; margin-top: 2px; }
+
+    /* AR Kamera Düwmesi */
+    .ar-button {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #1f6feb, #1158c7);
+      color: #ffffff;
+      border: none;
+      padding: 16px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 30px;
+      box-shadow: 0 8px 24px rgba(31, 111, 235, 0.4);
+      z-index: 100;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+    .ar-button:active { transform: translateX(-50%) scale(0.95); }
+
+    /* Model Ýüklenýär progress bar */
+    .loading-progress {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 14px;
+      color: #c9d1d9;
+      background: rgba(0,0,0,0.7);
+      padding: 12px 24px;
+      border-radius: 12px;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
 
-  <div class="info">
-    <h2 id="p-name">CRISTIANO RONALDO</h2>
-    <p>3D AR Model</p>
+  <div class="header-info">
+    <div class="player-title" id="playerName">CRISTIANO RONALDO</div>
+    <div class="player-sub">3D Realny AR Model</div>
   </div>
 
-  <!-- Göni models/papkaňyzyň içindäki model.glb faýly okaýar -->
+  <!-- 3D Model Viewer Komponenti -->
   <model-viewer 
     id="viewer"
     src="models/model.glb" 
     ar 
-    ar-modes="webxr scene-viewer quick-look" 
+    ar-modes="scene-viewer quick-look webxr" 
+    ar-scale="auto"
     ar-placement="floor"
     camera-controls 
     touch-action="pan-y"
-    shadow-intensity="1">
-    <button slot="ar-button" class="ar-btn">📷 Ýanymda Görkez (3D AR)</button>
+    shadow-intensity="1.5"
+    shadow-softness="1"
+    alt="3D Futbolçy Modeli">
+    
+    <button slot="ar-button" class="ar-button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Ýanymda Görkez (3D AR)
+    </button>
+
+    <div slot="poster" class="loading-progress">⏳ 3D Model ýüklenýär...</div>
   </model-viewer>
 
   <script>
-    // Linkden id okamak (?id=ronaldo)
+    // URL-den futbolçynyň id-sini okamak (?id=ronaldo)
     const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id');
+    const playerId = urlParams.get('id');
 
-    const pName = document.getElementById('p-name');
-    if (id) {
-      pName.innerText = id.toUpperCase();
+    if (playerId) {
+      document.getElementById('playerName').innerText = playerId.toUpperCase();
     }
   </script>
 
