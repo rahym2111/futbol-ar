@@ -36,7 +36,6 @@
       z-index: 1;
     }
 
-    /* Ýokarky Dolandyryş Paneli */
     .top-container {
       position: absolute;
       top: 20px;
@@ -114,20 +113,16 @@
     </button>
   </div>
 
-  <!-- AR Durnuklylygy Ýokarlandyrylan Model Viewer -->
   <model-viewer 
     id="viewer"
     src="models/ronaldo.glb" 
     ar 
-    ar-modes="scene-viewer quick-look webxr" 
+    ar-modes="webxr scene-viewer" 
     ar-scale="fixed"
     ar-placement="floor"
-    bounds="tight"
-    camera-controls 
-    enable-pan="false"
     interaction-prompt="none"
+    camera-controls 
     shadow-intensity="1"
-    shadow-softness="0.2"
     power-preference="high-performance"
     loading="eager"
     alt="3D Futbolçy Modeli">
@@ -142,6 +137,14 @@
 
     playerName.innerText = playerId.replace(/[-_]/g, ' ').toUpperCase();
     viewer.src = `models/${playerId.toLowerCase()}.glb`;
+
+    // AR Durnuklylygy üçin Event-ler
+    viewer.addEventListener('ar-status', (event) => {
+      if (event.detail.status === 'session-started') {
+        // AR başladylanda modeliň scale we rotation-yny bir gezek lock (berkitmek) edýäris
+        viewer.scale = '1 1 1';
+      }
+    });
 
     function activateAR() {
       if (viewer.canActivateAR) {
