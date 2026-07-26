@@ -1,433 +1,122 @@
 <!DOCTYPE html>
 <html lang="tk">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Real AR Football Player</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Realny AR Futbolçy</title>
+  
+  <!-- Google Model-Viewer Library -->
+  <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { width: 100vw; height: 100vh; overflow: hidden; background-color: #0d1117; color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      --poster-color: transparent;
+    }
 
-    <!-- model-viewer -->
-    <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js">
-    </script>
+    /* Futbolçy ady durýan ýer */
+    .header-info {
+      position: absolute;
+      top: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(22, 27, 34, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 20px;
+      text-align: center;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .player-title { font-size: 18px; font-weight: 700; color: #58a6ff; letter-spacing: 1px; }
+    .player-sub { font-size: 12px; color: #8b949e; margin-top: 2px; }
 
-    <style>
-        /* ---------- RESET ---------- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    /* AR Kamera Düwmesi */
+    .ar-button {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #1f6feb, #1158c7);
+      color: #ffffff;
+      border: none;
+      padding: 16px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 30px;
+      box-shadow: 0 8px 24px rgba(31, 111, 235, 0.4);
+      z-index: 100;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+    .ar-button:active { transform: translateX(-50%) scale(0.95); }
 
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #0b0f1a;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            touch-action: none;
-        }
-
-        /* ---------- MODEL-VIEWER ---------- */
-        model-viewer {
-            width: 100%;
-            height: 100%;
-            background: #0b0f1a;
-            --poster-color: transparent;
-            display: block;
-        }
-
-        /* ---------- HEADER ---------- */
-        .header {
-            position: absolute;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.65);
-            padding: 14px 28px;
-            border-radius: 30px;
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            text-align: center;
-            min-width: 200px;
-            user-select: none;
-            pointer-events: none;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        .header h2 {
-            color: #4da3ff;
-            letter-spacing: 2px;
-            font-size: 22px;
-            font-weight: 700;
-            text-shadow: 0 0 20px rgba(77, 163, 255, 0.3);
-        }
-
-        .header p {
-            margin-top: 4px;
-            color: #aaa;
-            font-size: 13px;
-            letter-spacing: 1px;
-            font-weight: 300;
-        }
-
-        /* ---------- AR BUTTON (slot) ---------- */
-        .ar-button {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            border: none;
-            padding: 18px 40px;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            background: linear-gradient(145deg, #1a73e8, #0d47a1);
-            color: white;
-            box-shadow: 0 10px 40px rgba(13, 71, 161, 0.45);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(4px);
-        }
-
-        .ar-button:hover {
-            transform: translateX(-50%) scale(1.04);
-            box-shadow: 0 14px 50px rgba(13, 71, 161, 0.6);
-        }
-
-        .ar-button:active {
-            transform: translateX(-50%) scale(0.96);
-        }
-
-        .ar-button svg {
-            width: 22px;
-            height: 22px;
-            fill: currentColor;
-        }
-
-        /* ---------- LOADING POSTER ---------- */
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
-            padding: 18px 32px;
-            border-radius: 18px;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 400;
-            letter-spacing: 0.5px;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            z-index: 50;
-        }
-
-        .loading .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top: 3px solid #4da3ff;
-            border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* ---------- PROGRESS BAR (optional) ---------- */
-        .progress-bar {
-            position: absolute;
-            bottom: 110px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 90;
-            width: 200px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .progress-bar.active {
-            opacity: 1;
-        }
-
-        .progress-bar .fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #4da3ff, #1a73e8);
-            border-radius: 4px;
-            transition: width 0.2s ease;
-        }
-
-        /* ---------- INFO BADGE ---------- */
-        .badge {
-            position: absolute;
-            bottom: 110px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 80;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 12px;
-            letter-spacing: 0.5px;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 6px 16px;
-            border-radius: 20px;
-            backdrop-filter: blur(6px);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            pointer-events: none;
-            user-select: none;
-            white-space: nowrap;
-        }
-
-        /* ---------- RESPONSIVE ---------- */
-        @media (max-width: 480px) {
-            .header {
-                top: 16px;
-                padding: 10px 18px;
-                min-width: unset;
-                max-width: 85%;
-            }
-            .header h2 {
-                font-size: 17px;
-            }
-            .header p {
-                font-size: 11px;
-            }
-            .ar-button {
-                padding: 14px 28px;
-                font-size: 15px;
-                bottom: 28px;
-                gap: 8px;
-            }
-            .ar-button svg {
-                width: 18px;
-                height: 18px;
-            }
-            .loading {
-                padding: 14px 22px;
-                font-size: 14px;
-            }
-            .badge {
-                bottom: 88px;
-                font-size: 10px;
-                padding: 4px 12px;
-            }
-            .progress-bar {
-                bottom: 85px;
-                width: 140px;
-            }
-        }
-
-        @media (orientation: landscape) and (max-height: 500px) {
-            .header {
-                top: 10px;
-                padding: 8px 16px;
-            }
-            .header h2 {
-                font-size: 15px;
-            }
-            .header p {
-                font-size: 10px;
-                margin-top: 2px;
-            }
-            .ar-button {
-                padding: 12px 24px;
-                font-size: 14px;
-                bottom: 16px;
-            }
-            .badge {
-                bottom: 72px;
-                font-size: 10px;
-            }
-            .progress-bar {
-                bottom: 68px;
-            }
-        }
-    </style>
+    /* Model Ýüklenýär progress bar */
+    .loading-progress {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 14px;
+      color: #c9d1d9;
+      background: rgba(0,0,0,0.7);
+      padding: 12px 24px;
+      border-radius: 12px;
+      pointer-events: none;
+    }
+  </style>
 </head>
-
 <body>
 
-    <!-- ===== HEADER ===== -->
-    <div class="header" id="header">
-        <h2 id="playerName">CRISTIANO RONALDO</h2>
-        <p>Real 3D · Augmented Reality</p>
-    </div>
+  <div class="header-info">
+    <div class="player-title" id="playerName">CRISTIANO RONALDO</div>
+    <div class="player-sub">3D Realny AR Model</div>
+  </div>
 
-    <!-- ===== PROGRESS BAR ===== -->
-    <div class="progress-bar" id="progressBar">
-        <div class="fill" id="progressFill"></div>
-    </div>
-
-    <!-- ===== BADGE ===== -->
-    <div class="badge">⚽ Täze ýerleşdirmek üçin ekrana degiň</div>
-
-    <!-- ===== MODEL-VIEWER ===== -->
-    <model-viewer
+  <!-- Optimizirlenen 3D Model Viewer Komponenti -->
+  <model-viewer 
     id="viewer"
-    src="https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb"
-    alt="Real Football Player 3D"
-    ar
-    ar-modes="webxr scene-viewer quick-look"
-    ar-placement="floor"
+    src="models/model.glb" 
+    ar 
+    ar-modes="webxr scene-viewer quick-look" 
     ar-scale="fixed"
-    camera-controls
+    ar-placement="floor"
+    camera-controls 
     touch-action="pan-y"
-    environment-image="neutral"
+    shadow-intensity="2"
+    shadow-softness="0.5"
     exposure="1.2"
-    shadow-intensity="2.5"
-    shadow-softness="0.6"
-    camera-orbit="0deg 75deg 2.8m"
-    field-of-view="30deg"
-    scale="1 1 1"
+    environment-image="neutral"
+    auto-rotate
+    rotation-per-second="30deg"
     interaction-prompt="auto"
-    min-camera-orbit="auto auto 1.2m"
-    max-camera-orbit="auto auto 6m"
-    >
-
-    <!-- AR Button (slot) -->
-    <button slot="ar-button" class="ar-button" id="arButton">
-        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-        Ýanymda Görkez
+    alt="3D Futbolçy Modeli">
+    
+    <button slot="ar-button" class="ar-button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Ýanymda Görkez (3D AR)
     </button>
 
-    <!-- Loading Poster -->
-    <div slot="poster" class="loading" id="loadingPoster">
-        <div class="spinner"></div>
-        <span>3D Model ýüklenýär...</span>
-    </div>
+    <div slot="poster" class="loading-progress">⏳ 3D Model ýüklenýär...</div>
+  </model-viewer>
 
-</model-viewer>
+  <script>
+    // URL-den futbolçynyň id-sini okamak (?id=ronaldo)
+    const urlParams = new URLSearchParams(window.location.search);
+    const playerId = urlParams.get('id');
 
-<!-- ===== JAVASCRIPT ===== -->
-<script>
-    (function() {
-        'use strict';
-
-        const viewer = document.getElementById('viewer');
-        const playerName = document.getElementById('playerName');
-        const progressBar = document.getElementById('progressBar');
-        const progressFill = document.getElementById('progressFill');
-        const loadingPoster = document.getElementById('loadingPoster');
-
-        // ---- URL param ――
-        const params = new URLSearchParams(window.location.search);
-        const player = params.get('id');
-        if (player) {
-            playerName.textContent = player.toUpperCase();
-        }
-
-        // ---- Progress updates ――
-        let progressShown = false;
-
-        viewer.addEventListener('progress', (e) => {
-            const pct = e.detail.totalProgress * 100;
-            if (pct > 0 && pct < 100) {
-                progressBar.classList.add('active');
-                progressFill.style.width = pct + '%';
-                progressShown = true;
-            } else if (pct >= 100) {
-                progressBar.classList.remove('active');
-                progressFill.style.width = '100%';
-                setTimeout(() => {
-                    progressFill.style.width = '0%';
-                }, 400);
-                progressShown = false;
-            }
-        });
-
-        // ---- Model loaded ――
-        viewer.addEventListener('load', () => {
-            console.log('✅ Model loaded successfully');
-            // Hide poster
-            if (loadingPoster) {
-                loadingPoster.style.opacity = '0';
-                setTimeout(() => {
-                    loadingPoster.style.display = 'none';
-                }, 500);
-            }
-            progressBar.classList.remove('active');
-        });
-
-        // ---- AR status ――
-        viewer.addEventListener('ar-status', (e) => {
-            const status = e.detail.status;
-            console.log('📱 AR status:', status);
-            if (status === 'session-started') {
-                // AR is active – hide progress
-                progressBar.classList.remove('active');
-            }
-            if (status === 'not-presenting') {
-                // exited AR – show badge hint
-            }
-        });
-
-        // ---- Error handling ――
-        viewer.addEventListener('error', (e) => {
-            console.error('❌ Model-Viewer error:', e);
-            // If the model fails, show a fallback message in the poster
-            if (loadingPoster) {
-                loadingPoster.innerHTML = `
-                        <span style="color:#ff6b6b;">⚠️</span>
-                        <span>Model ýüklenip bilmedi. Internet baglanyşygyňyzy barlaň.</span>
-                    `;
-                loadingPoster.style.display = 'flex';
-            }
-        });
-
-        // ---- Anchor stability: on tap, re-place the model on the floor ――
-        // This helps keep the model grounded when the user taps elsewhere
-        viewer.addEventListener('click', (e) => {
-            // Only if not in AR mode
-            if (!viewer.isArPresenting) {
-                // Small nudge to re-anchor – model-viewer auto-anchors with ar-placement="floor"
-                // but we can force a re-evaluation by toggling a property
-                // We'll just log it – the model should stay anchored due to ar-placement="floor"
-                console.log('🔄 Tapped – model stays anchored to floor');
-            }
-        });
-
-        // ---- Prevent accidental page scroll ――
-        document.addEventListener('touchmove', (e) => {
-            if (e.target.closest('model-viewer')) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-
-        // ---- Log AR support ――
-        if (navigator.xr) {
-            navigator.xr.isSessionSupported('immersive-ar')
-                .then((supported) => {
-                    console.log('📱 AR supported:', supported);
-                })
-                .catch(() => {});
-        }
-
-        // ---- Expose viewer to console for debugging ――
-        window.__viewer = viewer;
-
-        console.log('🚀 Real AR Football Player ready');
-        console.log('ℹ️  Model is anchored to floor, fixed scale, no auto-rotation');
-
-    })();
-</script>
+    if (playerId) {
+      document.getElementById('playerName').innerText = playerId.toUpperCase();
+    }
+  </script>
 
 </body>
 </html>
