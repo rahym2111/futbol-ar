@@ -1,117 +1,244 @@
 <!DOCTYPE html>
 <html lang="tk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Realny AR Futbolçy</title>
-  
-  <!-- Google Model-Viewer Library -->
-  <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-  
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { width: 100vw; height: 100vh; overflow: hidden; background-color: #0d1117; color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    
-    model-viewer {
-      width: 100%;
-      height: 100%;
-      --poster-color: transparent;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    /* Futbolçy ady durýan ýer */
-    .header-info {
-      position: absolute;
-      top: 25px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(22, 27, 34, 0.85);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 10px 20px;
-      border-radius: 20px;
-      text-align: center;
-      z-index: 100;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    }
-    .player-title { font-size: 18px; font-weight: 700; color: #58a6ff; letter-spacing: 1px; }
-    .player-sub { font-size: 12px; color: #8b949e; margin-top: 2px; }
+<title>Real AR Football Player</title>
 
-    /* AR Kamera Düwmesi */
-    .ar-button {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, #1f6feb, #1158c7);
-      color: #ffffff;
-      border: none;
-      padding: 16px 32px;
-      font-size: 16px;
-      font-weight: 600;
-      border-radius: 30px;
-      box-shadow: 0 8px 24px rgba(31, 111, 235, 0.4);
-      z-index: 100;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.2s ease;
-    }
-    .ar-button:active { transform: translateX(-50%) scale(0.95); }
+<script type="module"
+src="https://cdnjs.cloudflare.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js">
+</script>
 
-    /* Model Ýüklenýär progress bar */
-    .loading-progress {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 14px;
-      color: #c9d1d9;
-      background: rgba(0,0,0,0.7);
-      padding: 12px 24px;
-      border-radius: 12px;
-      pointer-events: none;
-    }
-  </style>
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html,body{
+width:100%;
+height:100%;
+overflow:hidden;
+background:#111827;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+model-viewer{
+width:100%;
+height:100%;
+background:#111827;
+
+--poster-color:transparent;
+}
+
+.header{
+
+position:absolute;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+z-index:100;
+
+background:rgba(0,0,0,.6);
+
+padding:15px 25px;
+
+border-radius:20px;
+
+backdrop-filter:blur(10px);
+
+color:white;
+
+text-align:center;
+
+}
+
+.header h2{
+
+color:#4da3ff;
+
+letter-spacing:2px;
+
+font-size:20px;
+
+}
+
+.header p{
+
+margin-top:5px;
+
+color:#bbb;
+
+font-size:13px;
+
+}
+
+.ar-button{
+
+position:absolute;
+
+bottom:35px;
+
+left:50%;
+
+transform:translateX(-50%);
+
+border:none;
+
+padding:18px 34px;
+
+border-radius:35px;
+
+font-size:17px;
+
+cursor:pointer;
+
+background:#1976d2;
+
+color:white;
+
+font-weight:bold;
+
+box-shadow:0 8px 30px rgba(0,0,0,.35);
+
+transition:.25s;
+
+}
+
+.ar-button:hover{
+
+background:#0d47a1;
+
+}
+
+.loading{
+
+position:absolute;
+
+top:50%;
+
+left:50%;
+
+transform:translate(-50%,-50%);
+
+background:rgba(0,0,0,.75);
+
+padding:14px 25px;
+
+border-radius:15px;
+
+color:white;
+
+font-size:15px;
+
+}
+
+</style>
+
 </head>
+
 <body>
 
-  <div class="header-info">
-    <div class="player-title" id="playerName">CRISTIANO RONALDO</div>
-    <div class="player-sub">3D Realny AR Model</div>
-  </div>
+<div class="header">
 
-  <!-- 3D Model Viewer Komponenti -->
-  <model-viewer 
-    id="viewer"
-    src="models/model.glb" 
-    ar 
-    ar-modes="scene-viewer quick-look webxr" 
-    ar-scale="auto"
-    ar-placement="floor"
-    camera-controls 
-    touch-action="pan-y"
-    shadow-intensity="1.5"
-    shadow-softness="1"
-    alt="3D Futbolçy Modeli">
-    
-    <button slot="ar-button" class="ar-button">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      Ýanymda Görkez (3D AR)
-    </button>
+<h2 id="playerName">CRISTIANO RONALDO</h2>
 
-    <div slot="poster" class="loading-progress">⏳ 3D Model ýüklenýär...</div>
-  </model-viewer>
+<p>Real 3D Augmented Reality</p>
 
-  <script>
-    // URL-den futbolçynyň id-sini okamak (?id=ronaldo)
-    const urlParams = new URLSearchParams(window.location.search);
-    const playerId = urlParams.get('id');
+</div>
 
-    if (playerId) {
-      document.getElementById('playerName').innerText = playerId.toUpperCase();
-    }
-  </script>
+<model-viewer
+
+id="viewer"
+
+src="models/model.glb"
+
+alt="Football Player"
+
+ar
+
+ar-modes="webxr scene-viewer quick-look"
+
+ar-placement="floor"
+
+ar-scale="fixed"
+
+camera-controls
+
+touch-action="pan-y"
+
+auto-rotate
+
+rotation-per-second="20deg"
+
+environment-image="neutral"
+
+exposure="1.3"
+
+shadow-intensity="2"
+
+shadow-softness="0.8"
+
+camera-orbit="0deg 75deg 2.8m"
+
+field-of-view="30deg"
+
+scale="1 1 1"
+
+interaction-prompt="auto"
+
+>
+
+<button slot="ar-button" class="ar-button">
+
+📱 Ýanymda Görkez
+
+</button>
+
+<div slot="poster" class="loading">
+
+3D Model ýüklenýär...
+
+</div>
+
+</model-viewer>
+
+<script>
+
+const viewer=document.getElementById("viewer");
+
+const params=new URLSearchParams(window.location.search);
+
+const player=params.get("id");
+
+if(player){
+
+document.getElementById("playerName").innerHTML=player.toUpperCase();
+
+}
+
+viewer.addEventListener("load",()=>{
+
+console.log("Model Loaded");
+
+});
+
+viewer.addEventListener("ar-status",(e)=>{
+
+console.log("AR Status:",e.detail.status);
+
+});
+
+viewer.addEventListener("error",(e)=>{
+
+console.log("Error:",e);
+
+});
+
+</script>
 
 </body>
 </html>
