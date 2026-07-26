@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Realny AR Futbolçy (Image Tracking)</title>
+  <title>AR Futbolçy Karta</title>
 
-  <!-- A-Frame WebGL Engine -->
+  <!-- A-Frame Engine -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-  <!-- MindAR Image Tracking Library -->
+  <!-- MindAR Image Tracking Engine -->
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
@@ -24,7 +24,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
     }
 
-    /* Ýokarky Başlyk UI */
+    /* Ýokarky Maglumat Bar-y */
     .header-info {
       position: absolute;
       top: 20px;
@@ -60,10 +60,9 @@
 </head>
 <body>
 
-  <!-- Ýokarky Maglumat Bar-y -->
   <div class="header-info">
     <div class="player-title" id="playerName">RONALDO</div>
-    <div class="player-sub">Kamerany Surata Tutuň</div>
+    <div class="player-sub">Kamerany Kartadaky Surata Tutuň</div>
   </div>
 
   <!-- MindAR Sahnasy -->
@@ -75,20 +74,15 @@
     device-orientation-permission-ui="enabled: false">
     
     <a-assets>
-      <!-- Model faýlyňyz ýüklenýär -->
       <a-asset-item id="playerModel" src="models/ronaldo.glb"></a-asset-item>
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <!-- targets.mind içindäki 1-nji surat (index: 0) üçin AR target -->
+    <!-- targets.mind içindäki 1-nji target (Index 0) -->
     <a-entity mindar-image-target="targetIndex: 0">
       
-      <!-- 
-        position="0 0 0" : Suratyň gaty ortasy
-        rotation="90 0 0": Modeli kartanyň üstünde dik duruzýar
-        scale="0.5 0.5 0.5": Model kartadan juda uly ýa-da kiçi bolsa, şu ýerden üýtgediň
-      -->
+      <!-- Modeli kartanyň üstünde dik oturtmak (rotation=90 0 0) -->
       <a-gltf-model 
         id="modelEntity"
         src="#playerModel" 
@@ -108,8 +102,6 @@
     const playerModel = document.getElementById('playerModel');
 
     playerName.innerText = playerId.replace(/[-_]/g, ' ').toUpperCase();
-    
-    // Model ýoluny dinamiki bellemek (models/ronaldo.glb)
     playerModel.setAttribute('src', `models/${playerId.toLowerCase()}.glb`);
   </script>
 
