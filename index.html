@@ -5,49 +5,86 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Realny AR Futbolçy</title>
   
-  <!-- Google Model-Viewer Library -->
+  <!-- Optimization: Preconnect & Preload library -->
+  <link rel="preconnect" href="https://ajax.googleapis.com" crossorigin>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
   
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { width: 100vw; height: 100vh; overflow: hidden; background-color: #0d1117; color: white; font-family: sans-serif; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    body { 
+      width: 100vw; 
+      height: 100vh; 
+      overflow: hidden; 
+      background-color: #0d1117; 
+      color: #ffffff; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
     
     model-viewer {
       width: 100%;
       height: 100%;
       --poster-color: transparent;
+      /* GPU render-i çaltlandyrmak üçin */
+      will-change: transform;
     }
 
     .header-info {
       position: absolute;
-      top: 25px;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(22, 27, 34, 0.85);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 10px 20px;
-      border-radius: 20px;
+      background: rgba(22, 27, 34, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 12px 24px;
+      border-radius: 24px;
       text-align: center;
-      z-index: 100;
+      z-index: 10;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      pointer-events: none;
     }
-    .player-title { font-size: 18px; font-weight: 700; color: #58a6ff; }
-    .player-sub { font-size: 12px; color: #8b949e; margin-top: 2px; }
+
+    .player-title { 
+      font-size: 16px; 
+      font-weight: 700; 
+      color: #58a6ff; 
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .player-sub { 
+      font-size: 11px; 
+      color: #8b949e; 
+      margin-top: 2px; 
+    }
 
     .ar-button {
       position: absolute;
-      bottom: 40px;
+      bottom: 36px;
       left: 50%;
       transform: translateX(-50%);
-      background: linear-gradient(135deg, #1f6feb, #1158c7);
+      background: linear-gradient(135deg, #238636, #1f6feb);
       color: #ffffff;
       border: none;
-      padding: 16px 32px;
-      font-size: 16px;
+      padding: 14px 28px;
+      font-size: 15px;
       font-weight: 600;
-      border-radius: 30px;
-      z-index: 100;
+      border-radius: 50px;
+      z-index: 10;
       cursor: pointer;
+      box-shadow: 0 4px 20px rgba(31, 111, 235, 0.4);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .ar-button:active {
+      transform: translateX(-50%) scale(0.96);
     }
   </style>
 </head>
@@ -60,14 +97,17 @@
 
   <model-viewer 
     id="viewer"
-    src="models/model.glb" 
+    src="models/ronaldo.glb" 
     ar 
-    ar-modes="scene-viewer quick-look webxr" 
+    ar-modes="webxr scene-viewer quick-look" 
     ar-scale="auto"
     ar-placement="floor"
     camera-controls 
     touch-action="pan-y"
     shadow-intensity="1"
+    shadow-softness="0.8"
+    power-preference="high-performance"
+    loading="eager"
     alt="3D Futbolçy Modeli">
     
     <button slot="ar-button" class="ar-button">
@@ -79,9 +119,15 @@
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const playerId = urlParams.get('id');
+    const viewer = document.getElementById('viewer');
+    const playerName = document.getElementById('playerName');
 
     if (playerId) {
-      document.getElementById('playerName').innerText = playerId.toUpperCase();
+      // Adyny täzeleýär
+      playerName.innerText = playerId.replace(/[-_]/g, ' ').toUpperCase();
+      
+      // ID-ä görä model faýlynyň ýoluny dynamic üýtgedýär (mysal: models/messi.glb)
+      viewer.src = `models/${playerId.toLowerCase()}.glb`;
     }
   </script>
 
