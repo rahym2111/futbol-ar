@@ -3,13 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>AR Futbolçy Karta</title>
+  <title>AR Futbolçy Karta (Gesture Control)</title>
 
   <!-- A-Frame Engine -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
   <!-- MindAR Image Tracking Engine -->
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <!-- Gesture Detector (Barmak bilen süýşürmek we ulaltmak/kiçeltmek üçin) -->
+  <script src="https://cdn.jsdelivr.net/gh/fcor/aframe-gesture-detector/dist/aframe-gesture-detector.min.js"></script>
 
   <style>
     * { 
@@ -62,16 +65,17 @@
 
   <div class="header-info">
     <div class="player-title" id="playerName">RONALDO</div>
-    <div class="player-sub">Kamerany Kartadaky Surata Tutuň</div>
+    <div class="player-sub">Barmagyňyz bilen modeli süýşürip/ulaldyp bilersiňiz</div>
   </div>
 
-  <!-- MindAR Sahnasy -->
+  <!-- MindAR Sahnasy + gesture-detector goşuldy -->
   <a-scene 
     mindar-image="imageTargetSrc: ./targets.mind;" 
     color-space="sRGB" 
     renderer="colorManagement: true, physicallyCorrectLights: true" 
     vr-mode-ui="enabled: false" 
-    device-orientation-permission-ui="enabled: false">
+    device-orientation-permission-ui="enabled: false"
+    gesture-detector>
     
     <a-assets>
       <a-asset-item id="playerModel" src="models/ronaldo.glb"></a-asset-item>
@@ -79,16 +83,21 @@
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <!-- targets.mind içindäki 1-nji target (Index 0) -->
+    <!-- targets.mind içindäki Target -->
     <a-entity mindar-image-target="targetIndex: 0">
       
-      <!-- Modeli kartanyň üstünde dik oturtmak (rotation=90 0 0) -->
+      <!-- 
+        class="cantarget" we gesture-handler-ler goşuldy:
+        - gesture-handler="minScale: 0.1; maxScale: 3;" (Ulaltmak/kiçeltmek çägi)
+      -->
       <a-gltf-model 
         id="modelEntity"
+        class="cantarget"
         src="#playerModel" 
         position="0 0 0" 
         rotation="90 0 0" 
-        scale="0.5 0.5 0.5">
+        scale="0.5 0.5 0.5"
+        gesture-handler="minScale: 0.1; maxScale: 3;">
       </a-gltf-model>
 
     </a-entity>
