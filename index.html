@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Realny AR Futbolçy (Advanced Controls)</title>
+  <title>Realny AR Futbolçy</title>
   
   <!-- Google Model-Viewer Library -->
-  <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
   
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { width: 100vw; height: 100vh; overflow: hidden; background-color: #0d1117; color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { width: 100vw; height: 100vh; overflow: hidden; background-color: #0d1117; color: white; font-family: sans-serif; }
     
     model-viewer {
       width: 100%;
@@ -18,7 +18,6 @@
       --poster-color: transparent;
     }
 
-    /* Futbolçy ady durýan ýer */
     .header-info {
       position: absolute;
       top: 25px;
@@ -31,12 +30,10 @@
       border-radius: 20px;
       text-align: center;
       z-index: 100;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
-    .player-title { font-size: 18px; font-weight: 700; color: #58a6ff; letter-spacing: 1px; }
+    .player-title { font-size: 18px; font-weight: 700; color: #58a6ff; }
     .player-sub { font-size: 12px; color: #8b949e; margin-top: 2px; }
 
-    /* AR Kamera Düwmesi */
     .ar-button {
       position: absolute;
       bottom: 40px;
@@ -49,28 +46,8 @@
       font-size: 16px;
       font-weight: 600;
       border-radius: 30px;
-      box-shadow: 0 8px 24px rgba(31, 111, 235, 0.4);
       z-index: 100;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.2s ease;
-    }
-    .ar-button:active { transform: translateX(-50%) scale(0.95); }
-
-    /* Model Ýüklenýär progress bar */
-    .loading-progress {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 14px;
-      color: #c9d1d9;
-      background: rgba(0,0,0,0.7);
-      padding: 12px 24px;
-      border-radius: 12px;
-      pointer-events: none;
     }
   </style>
 </head>
@@ -81,31 +58,22 @@
     <div class="player-sub">3D Realny AR Model</div>
   </div>
 
-  <!-- Advanced AR Sazlamasy: Durnuklylyk + scaling/positioning -->
   <model-viewer 
     id="viewer"
     src="models/model.glb" 
     ar 
-    ar-modes="webxr quick-look scene-viewer" 
+    ar-modes="scene-viewer quick-look webxr" 
     ar-scale="auto"
     ar-placement="floor"
     camera-controls 
     touch-action="pan-y"
-    shadow-intensity="2"
-    shadow-softness="0.5"
-    exposure="1.2"
-    environment-image="neutral"
-    interaction-prompt="auto"
-    alt="3D Futbolçy Modeli"
-    xr-spatial-tracking="stable"
-    scale="1 1 1">
+    shadow-intensity="1"
+    alt="3D Futbolçy Modeli">
     
     <button slot="ar-button" class="ar-button">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
       Ýanymda Görkez (3D AR)
     </button>
 
-    <div slot="poster" class="loading-progress">⏳ 3D Model ýüklenýär...</div>
   </model-viewer>
 
   <script>
