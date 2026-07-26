@@ -2,10 +2,10 @@
 <html lang="tk">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Futbolçy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Realny AR Futbolçy</title>
   
-  <!-- Model Viewer Library -->
+  <!-- Google Model-Viewer Library -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
   
   <style>
@@ -20,12 +20,12 @@
       width: 100%; 
       height: 100%; 
       overflow: hidden; 
-      background-color: #0d1117; 
+      background-color: #0b0e14; 
       color: #ffffff; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* Model Viewer tutuş ekrany eýeleýär */
+    /* 3D Model Viewer ekrany doldurýar */
     model-viewer {
       width: 100vw;
       height: 100vh;
@@ -37,68 +37,90 @@
       z-index: 1;
     }
 
-    /* Ýokarky Maglumat Bar-y */
-    .header-info {
+    /* Ýokarky Dolandyryş Paneli (Header) */
+    .top-container {
       position: absolute;
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(22, 27, 34, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 10px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      z-index: 100;
+      width: 90%;
+      max-width: 380px;
+      pointer-events: none; /* Düzümleriň aşagyndaky 3D modeliň aýlanmagy üçin */
+    }
+
+    /* Maglumat Bar-y */
+    .header-info {
+      width: 100%;
+      background: rgba(18, 24, 38, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 12px 20px;
       border-radius: 20px;
       text-align: center;
-      z-index: 10;
-      pointer-events: none; /* Model-i aňsatlyk bilen aýlamagyna päsgel bermezligi üçin */
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
 
     .player-title { 
       font-size: 18px; 
-      font-weight: 700; 
+      font-weight: 800; 
       color: #58a6ff; 
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
     }
 
     .player-sub { 
       font-size: 11px; 
       color: #8b949e; 
       margin-top: 2px; 
+      font-weight: 500;
     }
 
-    /* AR Düğmesi (Öňe çykaryldy we basylar ýaly z-index ýokarlandyryldy) */
+    /* AR Düğmesi - Indiki Ýeri Ýokarda */
     .ar-button {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
+      pointer-events: auto; /* Düwme basylar ýaly */
+      width: 100%;
       background: linear-gradient(135deg, #238636, #1f6feb);
       color: #ffffff;
-      border: none;
-      padding: 16px 32px;
-      font-size: 16px;
-      font-weight: 600;
-      border-radius: 50px;
-      z-index: 100; /* Basylman galmazlygy üçin öňe geçirildi */
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 14px 24px;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: 16px;
       cursor: pointer;
-      box-shadow: 0 4px 20px rgba(31, 111, 235, 0.5);
-      white-space: nowrap;
+      box-shadow: 0 6px 20px rgba(31, 111, 235, 0.4);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     .ar-button:active {
-      transform: translateX(-50%) scale(0.95);
+      transform: scale(0.97);
+      box-shadow: 0 2px 10px rgba(31, 111, 235, 0.3);
     }
   </style>
 </head>
 <body>
 
-  <!-- Ýokarky Başlyk -->
-  <div class="header-info">
-    <div class="player-title" id="playerName">RONALDO</div>
-    <div class="player-sub">3D Realny AR Model</div>
+  <!-- Ýokarky Bölüm: Maglumat + AR Düwme -->
+  <div class="top-container">
+    <div class="header-info">
+      <div class="player-title" id="playerName">CRISTIANO RONALDO</div>
+      <div class="player-sub">3D Realny AR Model</div>
+    </div>
+
+    <!-- Model-viewer üçin custom AR düwmesi göni ýokarda durýar -->
+    <button id="customArBtn" class="ar-button" onclick="activateAR()">
+      <span>📷</span> Ýanymda Görkez (3D AR)
+    </button>
   </div>
 
   <!-- 3D Model Viewer -->
@@ -107,35 +129,38 @@
     src="models/ronaldo.glb" 
     ar 
     ar-modes="webxr scene-viewer quick-look" 
-    ar-scale="auto"
+    ar-scale="fixed"
     ar-placement="floor"
+    disable-tap
     camera-controls 
-    touch-action="pan-y"
-    shadow-intensity="1"
-    shadow-softness="0.8"
+    interaction-prompt="none"
+    shadow-intensity="1.2"
+    shadow-softness="0.4"
     power-preference="high-performance"
     loading="eager"
     alt="3D Futbolçy Modeli">
-    
-    <button slot="ar-button" class="ar-button">
-      Ýanymda Görkez (3D AR)
-    </button>
-
   </model-viewer>
 
   <script>
+    // URL parametrik gözleg (?id=messi ýa-da ?id=ronaldo)
     const urlParams = new URLSearchParams(window.location.search);
-    // URL-de id bolmasa "ronaldo" bolup açylar
     const playerId = urlParams.get('id') || 'ronaldo'; 
 
     const viewer = document.getElementById('viewer');
     const playerName = document.getElementById('playerName');
 
-    // Futbolçynyň adyny üýtgetmek
+    // Futbolçynyň adyny we modelini düzeltmek
     playerName.innerText = playerId.replace(/[-_]/g, ' ').toUpperCase();
-    
-    // Model faýlynyň ýoluny bellenilýär (Körünýän ähli harplar kiçi harp bilen: models/ronaldo.glb)
     viewer.src = `models/${playerId.toLowerCase()}.glb`;
+
+    // Ýokarky düwmä basylanda AR režimini çagarmak
+    function activateAR() {
+      if (viewer.canActivateAR) {
+        viewer.activateAR();
+      } else {
+        alert("Siziň telefonyňyz ýa-da brauzeriňiz AR (Augmented Reality) režimini goldamaýar.");
+      }
+    }
   </script>
 
 </body>
