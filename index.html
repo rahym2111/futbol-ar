@@ -3,178 +3,114 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Realny AR Futbolçy</title>
-  
-  <link rel="preconnect" href="https://ajax.googleapis.com">
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-  
+  <title>Realny AR Futbolçy (Image Tracking)</title>
+
+  <!-- A-Frame WebGL Engine -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+  <!-- MindAR Image Tracking Library -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
   <style>
     * { 
-      box-sizing: border-box; 
       margin: 0; 
       padding: 0; 
+      box-sizing: border-box; 
       -webkit-tap-highlight-color: transparent;
     }
     
-    html, body { 
-      width: 100%; 
-      height: 100%; 
+    body { 
       overflow: hidden; 
-      background-color: #0b0e14; 
-      color: #ffffff; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-    
-    model-viewer {
-      width: 100vw;
-      height: 100vh;
-      --poster-color: transparent;
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
     }
 
-    /* Ýokarky Başlyk */
-    .top-container {
+    /* Ýokarky Başlyk UI */
+    .header-info {
       position: absolute;
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      z-index: 10;
-      width: 90%;
-      max-width: 380px;
+      background: rgba(18, 24, 38, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 24px;
+      border-radius: 20px;
+      text-align: center;
+      z-index: 999;
+      color: white;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
       pointer-events: none;
     }
 
-    .header-info {
-      width: 100%;
-      background: rgba(18, 24, 38, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 12px 20px;
-      border-radius: 20px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-
     .player-title { 
-      font-size: 18px; 
+      font-size: 16px; 
       font-weight: 800; 
       color: #58a6ff; 
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-transform: uppercase; 
     }
-
+    
     .player-sub { 
       font-size: 11px; 
       color: #8b949e; 
-      margin-top: 2px; 
-    }
-
-    /* MODEL-VIEWER-IŇ NATIVE AR DÜWMESI (ÝOKARDA ÝERLEŞDIRILDI) */
-    .ar-native-button {
-      position: absolute;
-      top: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 380px;
-      background: linear-gradient(135deg, #238636, #1f6feb);
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 14px 24px;
-      font-size: 15px;
-      font-weight: 700;
-      border-radius: 16px;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(31, 111, 235, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      z-index: 100;
-      white-space: nowrap;
-    }
-
-    .ar-native-button:active {
-      transform: translateX(-50%) scale(0.97);
-    }
-
-    #loadingText {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.75);
-      padding: 10px 20px;
-      border-radius: 20px;
-      font-size: 13px;
-      color: #58a6ff;
-      z-index: 10;
-      border: 1px solid rgba(88, 166, 255, 0.3);
+      margin-top: 2px;
     }
   </style>
 </head>
 <body>
 
-  <div class="top-container">
-    <div class="header-info">
-      <div class="player-title" id="playerName">RONALDO</div>
-      <div class="player-sub">3D Realny AR Model</div>
-    </div>
+  <!-- Ýokarky Maglumat Bar-y -->
+  <div class="header-info">
+    <div class="player-title" id="playerName">RONALDO</div>
+    <div class="player-sub">Kamerany Surata Tutuň</div>
   </div>
 
-  <div id="loadingText">3D Model Ýüklenýär...</div>
-
-  <model-viewer 
-    id="viewer"
-    src="models/ronaldo.glb" 
-    ar 
-    ar-modes="scene-viewer quick-look webxr" 
-    ar-scale="auto"
-    ar-placement="floor"
-    camera-controls 
-    interaction-prompt="none"
-    power-preference="high-performance"
-    loading="eager"
-    shadow-intensity="1"
-    alt="3D Futbolçy Modeli">
+  <!-- MindAR Sahnasy -->
+  <a-scene 
+    mindar-image="imageTargetSrc: ./targets.mind;" 
+    color-space="sRGB" 
+    renderer="colorManagement: true, physicallyCorrectLights: true" 
+    vr-mode-ui="enabled: false" 
+    device-orientation-permission-ui="enabled: false">
     
-    <!-- SLOT="AR-BUTTON" arkaly native düwme model-viewer-e baglandy -->
-    <button slot="ar-button" class="ar-native-button">
-      <span>📷</span> Ýanymda Görkez (3D AR)
-    </button>
+    <a-assets>
+      <!-- Model faýlyňyz ýüklenýär -->
+      <a-asset-item id="playerModel" src="models/ronaldo.glb"></a-asset-item>
+    </a-assets>
 
-  </model-viewer>
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <!-- targets.mind içindäki 1-nji surat (index: 0) üçin AR target -->
+    <a-entity mindar-image-target="targetIndex: 0">
+      
+      <!-- 
+        position="0 0 0" : Suratyň gaty ortasy
+        rotation="90 0 0": Modeli kartanyň üstünde dik duruzýar
+        scale="0.5 0.5 0.5": Model kartadan juda uly ýa-da kiçi bolsa, şu ýerden üýtgediň
+      -->
+      <a-gltf-model 
+        id="modelEntity"
+        src="#playerModel" 
+        position="0 0 0" 
+        rotation="90 0 0" 
+        scale="0.5 0.5 0.5">
+      </a-gltf-model>
+
+    </a-entity>
+  </a-scene>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const playerId = urlParams.get('id') || 'ronaldo'; 
 
-    const viewer = document.getElementById('viewer');
     const playerName = document.getElementById('playerName');
-    const loadingText = document.getElementById('loadingText');
+    const playerModel = document.getElementById('playerModel');
 
     playerName.innerText = playerId.replace(/[-_]/g, ' ').toUpperCase();
     
-    // Model faýlynyň durnukly ýüklenmegi
-    const modelPath = `models/${playerId.toLowerCase()}.glb`;
-    viewer.src = modelPath;
-
-    viewer.addEventListener('load', () => {
-      loadingText.style.display = 'none';
-    });
-
-    viewer.addEventListener('error', (ev) => {
-      loadingText.innerText = "Model faýly tapylmady: " + modelPath;
-      loadingText.style.color = "#ff7b72";
-    });
+    // Model ýoluny dinamiki bellemek (models/ronaldo.glb)
+    playerModel.setAttribute('src', `models/${playerId.toLowerCase()}.glb`);
   </script>
 
 </body>
