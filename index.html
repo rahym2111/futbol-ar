@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>AR Futbolçy Karta (Gesture Control)</title>
+  <title>AR Futbolçylar</title>
 
   <!-- A-Frame Engine -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-  <!-- MindAR Image Tracking Engine -->
+  <!-- MindAR Engine -->
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <!-- Gesture Detector (Barmak bilen süýşürmek we ulaltmak/kiçeltmek üçin) -->
@@ -27,7 +27,6 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
     }
 
-    /* Ýokarky Maglumat Bar-y */
     .header-info {
       position: absolute;
       top: 20px;
@@ -64,11 +63,10 @@
 <body>
 
   <div class="header-info">
-    <div class="player-title" id="playerName">RONALDO</div>
-    <div class="player-sub">Barmagyňyz bilen modeli süýşürip/ulaldyp bilersiňiz</div>
+    <div class="player-title" id="playerName">FUTBOLÇY</div>
+    <div class="player-sub">Kamerany Kartadaky Surata Tutuň</div>
   </div>
 
-  <!-- MindAR Sahnasy + gesture-detector goşuldy -->
   <a-scene 
     mindar-image="imageTargetSrc: ./targets.mind;" 
     color-space="sRGB" 
@@ -78,18 +76,14 @@
     gesture-detector>
     
     <a-assets>
+      <!-- Model dynamically yüklenir -->
       <a-asset-item id="playerModel" src="models/ronaldo.glb"></a-asset-item>
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <!-- targets.mind içindäki Target -->
-    <a-entity mindar-image-target="targetIndex: 0">
-      
-      <!-- 
-        class="cantarget" we gesture-handler-ler goşuldy:
-        - gesture-handler="minScale: 0.1; maxScale: 3;" (Ulaltmak/kiçeltmek çägi)
-      -->
+    <!-- Target index haysi futbolchy saýlanan bolsa şona awtomatiki geçýär -->
+    <a-entity id="targetEntity" mindar-image-target="targetIndex: 0">
       <a-gltf-model 
         id="modelEntity"
         class="cantarget"
@@ -99,7 +93,6 @@
         scale="0.5 0.5 0.5"
         gesture-handler="minScale: 0.1; maxScale: 3;">
       </a-gltf-model>
-
     </a-entity>
   </a-scene>
 
@@ -109,9 +102,19 @@
 
     const playerName = document.getElementById('playerName');
     const playerModel = document.getElementById('playerModel');
+    const targetEntity = document.getElementById('targetEntity');
 
     playerName.innerText = playerId.replace(/[-_]/g, ' ').toUpperCase();
+    
+    // Model yoluny bellemek
     playerModel.setAttribute('src', `models/${playerId.toLowerCase()}.glb`);
+
+    // Target Index Saýlamak (0 - Ronaldo, 1 - Neymar)
+    if (playerId.toLowerCase() === 'neymar') {
+      targetEntity.setAttribute('mindar-image-target', 'targetIndex: 1');
+    } else {
+      targetEntity.setAttribute('mindar-image-target', 'targetIndex: 0');
+    }
   </script>
 
 </body>
